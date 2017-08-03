@@ -1,5 +1,13 @@
 class HTMLNode():
     def __init__(self, tag, content, parent, attrib):
+        """Constructor of HTMLNode. Represents a single HTML element and all its content.
+
+            Args:
+                tag     (String)    : HTML tag of element. 
+                content (String)    : Content of element. (E.g. text inside a <h1></h1>)
+                parent  (String)    : Parent HTMLNode.
+                attrib  (Dicc)      : Dictionary cotaining all extra tags inside the HTML tag. (E.g. width, height etc.)
+        """
         self.id = id(self)
         self.tag = tag
         self.content = content
@@ -8,9 +16,19 @@ class HTMLNode():
         self.attrib = attrib
         
     def add_child(self, child_node):
+        """Method to add child to HTMLNode.
+
+            Args:
+                child_node (HTMLNode) : New child.
+        """
         self.children.append(child_node)
 
     def remove_child(self, child_node):
+        """Method to remove child from HTMLNode.
+
+            Args:
+                child_node (HTMLNode) : Node to remove.
+        """
         self.children.remove(child_node)
     
     def __setitem__(self, key, item):
@@ -29,11 +47,24 @@ class HTMLNode():
         
 class HTMLTree():
     def __init__(self):
+        """Constructor of HTMLTree class.
+
+            Usage:
+                my_tree = HTMLTree()
+        """
         self.root = None
         self.nodes = []
         self.no_parent_tags = ['img', 'link', 'meta', 'br/', 'br', 'area', 'base', 'col', 'input']
     
     def parse_from_string(self, string):
+        """Method to parse HTML from given String.
+
+            Args:
+                string (String): String to parse from.
+            
+            Usage:
+                Obj.parse_from_string(<html string>)
+        """
         def first_split(source, char):
             # Check if char is in source
             if char not in source:
@@ -65,6 +96,13 @@ class HTMLTree():
         self.construct_tree(raw_nodes)
     
     def construct_tree(self, raw_nodes):
+        """Constructs DOM tree based on previous parsed string.
+           Is automaticly called by parse functions.
+
+           Args:
+                raw_nodes (List) : List of lists where each sublist contains information about one node.
+        """
+
         cur_parent = None
         #print(raw_nodes)
         for _node in raw_nodes:
@@ -98,6 +136,14 @@ class HTMLTree():
                 self.nodes.append(node)
                 
     def construct_node(self, node_data):
+        """Method to construct node based on a raw_node item.
+
+            Args:
+                node_data (List) : List containing infos about node. (tag, tag_map, content).abs
+            
+            Returns:
+                HTMLNode : HTMLNode based on given node_data.
+        """
         tag = node_data[0]
         content = node_data[2]
         attrib = {}
@@ -109,20 +155,56 @@ class HTMLTree():
         return HTMLNode(tag, content, None, attrib)
     
     def parse_from_file(self, file):
+        """Method to read html from file. After it finished reading the content is parsed as a string.
+
+            Args:
+                file (String): Filename or path to file.
+
+            Usage:
+                OBJ.parse_from_file(<MyHtmlFile>)
+        """
         with open(file, 'r') as f:
             self.parse_from_string(f.read())
     
     def find_tag(self, tag):
+        """Method to find HTML elements based on their tag.
+
+            Args:
+                tag (String) : Tag to look for.
+            
+            Returns:
+                List : Contains all found HTMLNodes with given tag.
+        """
         return [x for x in self.nodes if x.tag == tag]
 
     def find_id(self, id):
+        """Method to find HTML element with given id. 
+           If multiple elements have the same id (should not happen in valid HTML),
+           only the first is returned.
+
+            Args:
+                id (String) : id to look for.
+            
+            Returns:
+                HTMLNode : If node with given id is found else...
+                None
+        """
         f = [x for x in self.nodes if 'id' in x.attrib and x.attrib['id'] == id]
         if len(f) > 0:
             return f[0]
         return None
     
-    def find_class(self, _class):
-        f = [x for x in self.nodes if 'class' in x.attrib and x.attrib['class'] == _class]
+    def find_class(self, class):
+        """Method to find all HTML elements with given class.
+
+            Args:
+                class (String) : Name of class to look for.
+            
+            Returns:
+                List : List containing all found HTMLNodes.
+        
+        """
+        f = [x for x in self.nodes if 'class' in x.attrib and x.attrib['class'] == class]
         return f
 
     def __setitem__(self, key, item):
@@ -136,8 +218,3 @@ class HTMLTree():
        for n in self.nodes:
            t += str(n)
        return t
-        
-    def log(self,message):
-        with open('log.txt', 'a') as f:
-            f.write(message)
-
