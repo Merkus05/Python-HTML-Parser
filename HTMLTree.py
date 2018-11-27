@@ -73,8 +73,8 @@ class HTMLTree():
             return [source[0:index].lstrip().rstrip(), source[index + 1: ].lstrip().rstrip().rstrip('"').lstrip('"')]
             
         # Find all tags and filter out comments and doctype
-        tags = map(lambda x: x.lstrip().rstrip(), string.split('<'))
-        tags = filter(lambda x: x != '' and not x.startswith('!'), tags)
+        tags = list(map(lambda x: x.lstrip().rstrip(), string.split('<')))
+        tags = list(filter(lambda x: x != '' and not x.startswith('!'), tags))
 
         raw_nodes = []
         
@@ -84,7 +84,7 @@ class HTMLTree():
             if '>' in _tag:
                 content = _tag.split('>')[1]
 
-            tag_map = map(lambda x: x.lstrip().rstrip(), _tag.split('>')[0].split(' '))
+            tag_map = list(map(lambda x: x.lstrip().rstrip(), _tag.split('>')[0].split(' ')))
 
             # Get tag name and remove it from tag map
             tag = tag_map[0]
@@ -194,7 +194,7 @@ class HTMLTree():
             return f[0]
         return None
     
-    def find_class(self, class):
+    def find_class(self, _class):
         """Method to find all HTML elements with given class.
 
             Args:
@@ -204,7 +204,7 @@ class HTMLTree():
                 List : List containing all found HTMLNodes.
         
         """
-        f = [x for x in self.nodes if 'class' in x.attrib and x.attrib['class'] == class]
+        f = [x for x in self.nodes if 'class' in x.attrib and x.attrib['class'] == _class]
         return f
 
     def __setitem__(self, key, item):
